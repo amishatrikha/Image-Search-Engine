@@ -12,7 +12,7 @@
    • Keyboard: Escape closes lightbox
 ───────────────────────────────────────────── */
 
-const BACKEND   = "https://your-backend.onrender.com"; // ← replace with your Render URL
+const BACKEND   = "https://image-search-engine-2hfu.onrender.com"; // ← replace with your Render URL
 const API_BASE  = `${BACKEND}/api/images`;
 const PEXELS_KEY = ""; // Set via backend proxy — see backend/.env
 const PER_PAGE  = 15;
