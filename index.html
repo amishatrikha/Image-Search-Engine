@@ -1,24 +1,109 @@
 <!DOCTYPE html>
-<html lang="en" dir="'ltr">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <title>Image Search Engine</title>
-    <link rel="stylesheet" href="style.css">
+    <title>ImageSearch &mdash; Image Search Engine</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Search and download millions of high-quality images powered by Pexels.">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
     <script src="script.js" defer></script>
 </head>
 <body>
-    <div class="lightbox">
+
+    <!-- Auth Modal -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+            <div class="auth-brand">
+                <i class="uil uil-images"></i>
+                <span>ImageSearch</span>
+            </div>
+
+            <!-- Tabs -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin" data-tab="login">Sign In</button>
+                <button class="auth-tab" id="tabRegister" data-tab="register">Create Account</button>
+            </div>
+
+            <!-- Error message -->
+            <div class="auth-error" id="authError" hidden></div>
+
+            <!-- Login Form -->
+            <form class="auth-form" id="loginForm" novalidate>
+                <h2 class="auth-title" id="authTitle">Welcome back</h2>
+                <div class="auth-field">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="off" required>
+                </div>
+                <div class="auth-field">
+                    <label for="loginPassword">Password</label>
+                    <div class="password-wrap">
+                        <input type="password" id="loginPassword" placeholder="Your password" autocomplete="off" required>
+                        <button type="button" class="toggle-pw" data-target="loginPassword" aria-label="Toggle password visibility">
+                            <i class="uil uil-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="auth-submit" id="loginSubmit">Sign In</button>
+                <button type="button" class="forgot-link" id="forgotLink">Forgot password?</button>
+            </form>
+
+            <!-- Forgot Password Form -->
+            <form class="auth-form" id="forgotForm" novalidate hidden>
+                <h2 class="auth-title">Reset password</h2>
+                <p class="auth-sub">Enter your email and we'll send you a reset link.</p>
+                <div class="auth-field">
+                    <label for="forgotEmail">Email</label>
+                    <input type="email" id="forgotEmail" placeholder="you@example.com" autocomplete="email" required>
+                </div>
+                <button type="submit" class="auth-submit" id="forgotSubmit">Send Reset Link</button>
+                <button type="button" class="forgot-link" id="backToLogin">&#8592; Back to Sign In</button>
+            </form>
+
+            <!-- Register Form -->
+            <form class="auth-form" id="registerForm" novalidate hidden>
+                <h2 class="auth-title">Create your account</h2>
+                <div class="auth-field">
+                    <label for="regName">Full Name</label>
+                    <input type="text" id="regName" placeholder="John Doe" autocomplete="name" required>
+                </div>
+                <div class="auth-field">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email" required>
+                </div>
+                <div class="auth-field">
+                    <label for="regPassword">Password <span class="field-hint">(min 6 characters)</span></label>
+                    <div class="password-wrap">
+                        <input type="password" id="regPassword" placeholder="Create a password" autocomplete="new-password" required>
+                        <button type="button" class="toggle-pw" data-target="regPassword" aria-label="Toggle password visibility">
+                            <i class="uil uil-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="auth-submit" id="registerSubmit">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lightbox / Image Preview Modal -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image preview">
         <div class="wrapper">
-            <header>
+            <header class="lightbox-header">
                 <div class="photographer">
                     <i class="uil uil-camera"></i>
-                    <span></span>
+                    <span class="photographer-name"></span>
                 </div>
+                <span class="img-resolution"></span>
                 <div class="buttons">
-                    <i class="uil uil-import"></i>
-                    <i class="uil uil-times"></i>
+                    <button class="lb-btn" id="copyLinkBtn" title="Copy image link" aria-label="Copy image link">
+                        <i class="uil uil-link"></i>
+                    </button>
+                    <button class="lb-btn" id="downloadImgBtn" title="Download image" aria-label="Download image">
+                        <i class="uil uil-import"></i>
+                    </button>
+                    <button class="lb-btn close-btn" id="closeImgBtn" title="Close" aria-label="Close preview">
+                        <i class="uil uil-times"></i>
+                    </button>
                 </div>
             </header>
             <div class="preview-img">
@@ -26,21 +111,82 @@
             </div>
         </div>
     </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Hero / Search Section -->
     <section class="search">
-        <img src="images/image1.jpg" alt="search-img">
+        <div class="hero-overlay"></div>
+        <div class="hero-bg" id="heroBg"></div>
         <div class="content">
-            <h1>Image Search Engine</h1>
-            <p>Search and download any image</p>
+            <div class="brand">
+                <i class="uil uil-images"></i>
+                <h1>ImageSearch</h1>
+            </div>
+            <p class="tagline">Discover &amp; download millions of stunning, royalty-free images</p>
+
             <div class="search-box">
                 <i class="uil uil-search"></i>
-                <input type="text" placeholder="Search images">
+                <input type="text" id="searchInput" placeholder="Search for images…" autocomplete="off" aria-label="Search images">
+                <button class="clear-btn" id="clearBtn" aria-label="Clear search" title="Clear" hidden>
+                    <i class="uil uil-times"></i>
+                </button>
+            </div>
+
+            <!-- Recent Searches -->
+            <div class="recent-searches" id="recentSearches" hidden>
+                <span class="recent-label"><i class="uil uil-history"></i> Recent:</span>
+                <div class="recent-tags" id="recentTags"></div>
+                <button class="clear-history" id="clearHistory">Clear all</button>
             </div>
         </div>
+
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme">
+            <i class="uil uil-moon"></i>
+        </button>
+
+        <!-- User Menu -->
+        <div class="user-menu" id="userMenu" hidden>
+            <div class="user-avatar" id="userAvatar"></div>
+            <span class="user-name" id="userName"></span>
+            <button class="logout-btn" id="logoutBtn" title="Sign out" aria-label="Sign out">
+                <i class="uil uil-signout"></i>
+            </button>
+        </div>
     </section>
+
+    <!-- Category Filter Chips -->
+    <div class="categories" id="categories">
+        <button class="chip active" data-category="">All</button>
+        <button class="chip" data-category="nature">Nature</button>
+        <button class="chip" data-category="architecture">Architecture</button>
+        <button class="chip" data-category="travel">Travel</button>
+        <button class="chip" data-category="food">Food</button>
+        <button class="chip" data-category="technology">Technology</button>
+        <button class="chip" data-category="animals">Animals</button>
+        <button class="chip" data-category="people">People</button>
+        <button class="chip" data-category="space">Space</button>
+        <button class="chip" data-category="abstract">Abstract</button>
+    </div>
+
+    <!-- Results Info Bar -->
+    <div class="results-bar" id="resultsBar" hidden>
+        <span id="resultsCount"></span>
+    </div>
+
+    <!-- Gallery -->
     <section class="gallery">
-        <ul class="images"></ul>
-        <button class="load-more">Load More</button>
+        <ul class="images" id="imagesWrapper"></ul>
+        <div class="skeleton-grid" id="skeletonGrid" hidden></div>
+        <button class="load-more" id="loadMoreBtn" style="display:none">Loading&hellip;</button>
     </section>
-    
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top">
+        <i class="uil uil-angle-up"></i>
+    </button>
+
 </body>
 </html>
